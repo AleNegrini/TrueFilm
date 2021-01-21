@@ -65,14 +65,15 @@ def init_env(list:List[str]) -> Dict[str, str]:
 
     return vars
 
-def jdbc_url_builder(host: str, port: str):
+def jdbc_url_builder(host: str, port: str, db: str):
     """
     Builds the postresql jdbc URL
     :param host: postresql hostname
     :param port: postresql port
+    :param db: db_name
     :return: postresql jdbc URL
     """
-    return 'jdbc:postgresql://'+host+':'+port+'/truelayer'
+    return 'jdbc:postgresql://'+host+':'+port+'/'+db
 
 if __name__ == '__main__':
 
@@ -158,8 +159,8 @@ if __name__ == '__main__':
                'production_companies',
                'genres')
 
-    url = jdbc_url_builder(host=env_vars['POSTGRES_HOST'],port=env_vars['POSTGRES_PORT'])
     a = load_dotenv('../../database.env')
+    url = jdbc_url_builder(host=env_vars['POSTGRES_HOST'],port=env_vars['POSTGRES_PORT'],db=os.environ['POSTGRES_DB'])
     properties = {"user": os.environ['POSTGRES_USER'],
                   "password": os.environ['POSTGRES_PASSWORD'],
                   "driver": "org.postgresql.Driver"}

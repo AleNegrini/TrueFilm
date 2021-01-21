@@ -1,6 +1,7 @@
-from pyspark.sql import SparkSession, DataFrame
+from pyspark.sql import SparkSession, DataFrame, SQLContext
 from pyspark.sql.types import StructType
 from typing import Optional
+from typing import Dict
 import logging
 
 def read_csv_with_schema(spark: SparkSession,
@@ -147,3 +148,29 @@ def read_parquet(spark: SparkSession,
     except Exception as error:
         logging.error("An error occurred while reading PARQUET dataframe: %s", error)
         return None
+
+
+def read_jdbc(spark: SparkSession, url: str, table_name: str, user:str, pwd: str, driver: str) -> DataFrame:
+    """
+    Read dataframe from jdbc source
+    :param spark: Spark Session
+    :param url: jdbc url
+    :param table_name: table to read
+    :param user: username
+    :param pwd: password
+    :param drive: driver
+    :return: read dataframe
+    """
+    logger = logging.getLogger(__name__)
+    try:
+        sc = spark.sparkContext
+        sqlContext = SQLContext(sc)
+        df = sqlContext.read.format('jdbc').options(url=url,
+                                                    dbtable=table_name,
+                                                    driver=driver,
+                                                    user=user,
+                                                    password=pwd).load()
+        logger.info("Dataframe has been successfully read from %s", table_name)
+        return df
+    except Exception as e:
+        logger.error("An error occurred while reading dataframe file from %s: %s", table_name, e)
