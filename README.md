@@ -12,10 +12,36 @@ Before running the job, please make sure your environment satisfies the followin
 - `Docker` ([download link](http://github.com))
 - `Docker-compose` ([download link](http://github.com))
 
-## Run mode
+## Running mode
+
 ### Run the job
 
-### Get Access to the results
+### Get Access to the data
+
+Three are the containers started by launching the `docker-compose`.
+If you want to check their details, just type:
+```
+docker ps
+```
+
+(*) container ids could be different 
+
+#### Dev DB
+```
+docker exec -it <container_name> bash
+```
+
+Connect to local database instace using the `psql` client:
+```
+psql --host=localhost --user= --db=
+```
+
+#### Prod DB
+
+```
+docker exec -it <container_name> bash
+```
+
 
 
 ### Deploy
