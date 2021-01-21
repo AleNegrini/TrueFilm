@@ -28,5 +28,5 @@ jobs:
         run: |
           docker-compose up
       - name: Test integration tests
-          run: |
-            ./run-tests-it.sh
+        run: |
+          ./run-tests-it.sh
