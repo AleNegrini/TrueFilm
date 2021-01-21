@@ -1,5 +1,3 @@
-Package            Version
------------------- -------
 astroid            2.4.2
 attrs              20.3.0
 dataclasses        0.6
