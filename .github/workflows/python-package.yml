@@ -1,4 +1,4 @@
-name: cicd_test
+name: cicd_truefilm
 
 on:
   push:
