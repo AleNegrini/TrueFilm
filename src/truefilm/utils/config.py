@@ -3,8 +3,8 @@ from typing import List, Dict
 import logging
 from typing import Optional
 
-DEFAULT_CONFIG_FOLDERS_SEARCH_FINAL = ['../../resources/final_ok', '../resources/final_ok', 'resources/final_ok']
-DEFAULT_CONFIG_FOLDERS_SEARCH_RAW = ['../../resources/raw_ok', '../resources/raw_ok', 'resources/raw_ok']
+DEFAULT_CONFIG_FOLDERS_SEARCH_FINAL = ['../../resources/final', '../resources/final', 'resources/final']
+DEFAULT_CONFIG_FOLDERS_SEARCH_RAW = ['../../resources/raw', '../resources/raw', 'resources/raw']
 logger = logging.getLogger(__name__)
 
 class Config:
