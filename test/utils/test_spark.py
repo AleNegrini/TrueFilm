@@ -9,7 +9,8 @@ class TestSpark(unittest.TestCase):
         sparkSession1 = Spark(master="local",
                               app_name="TrueFilmTest1",
                               log_level="WARN",
-                              xml_jar_path=os.getcwd()+('/../../resources/jar/spark-xml_2.11-0.5.0.jar'))
+                              xml_jar_path=os.getcwd()+('/../../resources/jar/spark-xml_2.11-0.5.0.jar'),
+                              jdbc_jar_path=os.getcwd()+('/../../resources/jar/postresql-42.2.18.jar'))
 
         configurations1 = sparkSession1.spark.sparkContext.getConf().getAll()
 
@@ -25,7 +26,8 @@ class TestSpark(unittest.TestCase):
         sparkSession = Spark(master="local",
                               app_name="TrueFilmTest",
                               log_level="WARN",
-                              xml_jar_path=os.getcwd()+('/../../resources/jar/spark-xml_2.11-0.5.0.jar'))
+                              xml_jar_path=os.getcwd()+('/../../resources/jar/spark-xml_2.11-0.5.0.jar'),
+                              jdbc_jar_path=os.getcwd()+('/../../resources/jar/postresql-42.2.18.jar'))
         self.assertIsInstance(sparkSession.spark, SparkSession)
         sparkSession.stop_spark()
 
