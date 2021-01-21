@@ -138,6 +138,5 @@ class WikipediaHandler:
         join_anti = clean_movies.join(join, ['id'], how='left_anti')
         join_anti = join_anti.withColumn('url', F.lit(None))
 
-
         return join.select('id','budget','revenue','ratio_revenue_budget','profit','year','url','production_companies','genres')\
             .union(join_anti.select('id','budget','revenue','ratio_revenue_budget','profit','year','url','production_companies','genres'))

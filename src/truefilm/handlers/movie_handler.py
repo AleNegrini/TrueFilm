@@ -165,5 +165,6 @@ class MovieHandler:
         return final_movies\
             .select('id','title','budget','revenue', 'ratio_revenue_budget', 'profit', 'year','production_companies','genres')\
             .filter((F.col('budget') != 0) & (F.col('revenue') != 0))\
+            .filter((F.col('profit') == True))\
             .orderBy(F.col('ratio_revenue_budget'), ascending=True)\
             .limit(rows)
