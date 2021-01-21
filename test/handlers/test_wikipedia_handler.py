@@ -86,28 +86,27 @@ class WikipediaProcessorTest(unittest.TestCase):
                              ('the hobbit',2016,7,2000000,2000000,1,False,'{}','{}'),
                              ('new film',2010,18,2000000,2000000,1,False,'{}','{}')]
 
-        input_data_wikipedia = [('silicon graphics image',True, 1999, 1, 'http://1'),
-                                ('Harry Potter: il calice di fuoco',True,None,4, 'http://4'),
-                                ('THE hobbit',False,None, 7, 'http://7'),
-                                ('dr. who',False,None, 10, 'http://10'),
-                                ('aaaaaa',True,1989, 11, 'http://11')]
+        input_data_wikipedia = [('silicon graphics image',True, 1999, 1, 'http://1','lorem ipsum'),
+                                ('Harry Potter: il calice di fuoco',True,None,4, 'http://4', 'lorem ipsum'),
+                                ('THE hobbit',False,None, 7, 'http://7', 'lorem ipsum'),
+                                ('dr. who',False,None, 10, 'http://10', 'lorem ipsum'),
+                                ('aaaaaa',True,1989, 11, 'http://11', 'lorem ipsum')]
 
         schema_movies = ['title','year','id','budget','revenue','ratio_revenue_budget','profit','production_companies','genres']
-        schema_wikipedia = ['title', 'flag_movie','year','id','url']
+        schema_wikipedia = ['title', 'flag_movie','year','id','url','abstract']
 
         wiki_df = WikipediaHandler(self.spark.createDataFrame(data=input_data_wikipedia, schema=schema_wikipedia))
         movie = self.spark.createDataFrame(data=input_data_movies, schema=schema_movies)
 
         output_df = wiki_df.wikipedia_matcher(movie)
 
-        expected = [(1, 2000000, 2000000, 1, False, 1999, 'http://1', '{}', '{}'),
-                       (4, 2000000, 2000000, 1, False, 2008, 'http://4', '{}', '{}'),
-                       (7, 2000000, 2000000, 1, False, 2016, 'http://7', '{}', '{}'),
-                       (18, 2000000, 2000000, 1, False, 2010, None, '{}', '{}')]
+        expected = [(1, 2000000, 2000000, 1, False, 1999, 'http://1', '{}', '{}', 'lorem ipsum'),
+                       (4, 2000000, 2000000, 1, False, 2008, 'http://4', '{}', '{}', 'lorem ipsum'),
+                       (7, 2000000, 2000000, 1, False, 2016, 'http://7', '{}', '{}', 'lorem ipsum'),
+                       (18, 2000000, 2000000, 1, False, 2010, None, '{}', '{}', None)]
 
-        schema_expected = ['id', 'budget', 'revenue', 'ratio_revenue_budget', 'profit', 'year',
-                           'url', 'production_companies', 'genres']
+        schema_expected = ['id', 'budget', 'revenue', 'ratio', 'profit', 'year',
+                           'url', 'production_companies', 'genres','abstract']
 
         expected_df = self.spark.createDataFrame(data=expected, schema=schema_expected)
-
         self.assertListEqual(output_df.orderBy('id').collect(), expected_df.orderBy('id').collect())

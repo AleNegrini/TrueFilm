@@ -93,8 +93,7 @@ class WikipediaHandler:
 
         # caching dataframes before joining
 
-        clean_wiki = clean_wiki.select('title','movie_flag','year','url')
-
+        clean_wiki = clean_wiki.select('title','movie_flag','year','url','abstract')
 
         self.logger.info("PRE-JOIN: Movies dataframe counts a total of %d rows", clean_movies.dropDuplicates(['id']).count())
         self.logger.info("PRE-JOIN: Wikipedia dataframe counts a total of %d rows", clean_wiki.count())
@@ -129,14 +128,14 @@ class WikipediaHandler:
         self.logger.info("POST-JOIN-3: TrueFilm matched a total of %d rows", joined_movies_3.count())
         joined_movies_3.cache()
 
-
-        join = joined_movies_1.select('id','budget','revenue','ratio_revenue_budget','profit','year','url','production_companies','genres')\
-            .union(joined_movies_2.select('id','budget','revenue','ratio_revenue_budget','profit','year','url','production_companies','genres'))\
-            .union(joined_movies_3.select('id','budget','revenue','ratio_revenue_budget','profit','year','url','production_companies','genres'))
+        join = joined_movies_1.select('id','budget','revenue','ratio_revenue_budget','profit','year','url','production_companies','genres','abstract')\
+            .union(joined_movies_2.select('id','budget','revenue','ratio_revenue_budget','profit','year','url','production_companies','genres','abstract'))\
+            .union(joined_movies_3.select('id','budget','revenue','ratio_revenue_budget','profit','year','url','production_companies','genres','abstract'))
 
 
         join_anti = clean_movies.join(join, ['id'], how='left_anti')
         join_anti = join_anti.withColumn('url', F.lit(None))
+        join_anti = join_anti.withColumn('abstract', F.lit(None))
 
-        return join.select('id','budget','revenue','ratio_revenue_budget','profit','year','url','production_companies','genres')\
-            .union(join_anti.select('id','budget','revenue','ratio_revenue_budget','profit','year','url','production_companies','genres'))
+        return join.select('id','budget','revenue',F.col('ratio_revenue_budget').alias('ratio'),'profit','year','url','production_companies','genres','abstract')\
+            .union(join_anti.select('id','budget','revenue',F.col('ratio_revenue_budget').alias('ratio'),'profit','year','url','production_companies','genres','abstract'))

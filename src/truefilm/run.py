@@ -3,6 +3,8 @@ import logging
 from typing import Dict, List
 import os
 from dotenv import load_dotenv
+from pyspark.sql.window import Window
+import pyspark.sql.functions as F
 
 from src.truefilm.utils.spark import Spark
 from src.truefilm.spark_io.reader import read_csv_with_schema, read_xml_no_schema, read_parquet
@@ -146,18 +148,24 @@ if __name__ == '__main__':
     movies_1k_top_enriched = wikipedia_processor.wikipedia_matcher(movies_1k_top)
 
     # join with the original movies dataframe, in order to get the original film titles
-    movies_1k_top_enriched = movies_1k_top_enriched.join(movies.select('id','title'), ['id'], how='inner')
-    movies_1k_top_enriched = movies_1k_top_enriched.\
-        select('id',
+    movies_1k_top_enriched = movies_1k_top_enriched\
+        .join(movies.select('id','title'), ['id'], how='inner')\
+        .withColumn('application',F.lit('truefilm'))
+    windowSpec = Window.partitionBy('application').orderBy('ratio')
+    movies_1k_top_enriched = movies_1k_top_enriched\
+        .withColumn('rating', F.row_number().over(windowSpec))\
+        .select('id',
                'title',
                'budget',
+               'rating',
                'revenue',
-               'ratio_revenue_budget',
+               'ratio',
                'profit',
                'year',
                'url',
                'production_companies',
-               'genres')
+               'genres',
+               'abstract')
 
     a = load_dotenv('../../database.env')
     url = jdbc_url_builder(host=env_vars['POSTGRES_HOST'],port=env_vars['POSTGRES_PORT'],db=os.environ['POSTGRES_DB'])

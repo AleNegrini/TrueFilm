@@ -1,5 +1,10 @@
 # TrueFilm
 
+<p align="left">
+        <img src="https://img.shields.io/github/v/tag/AleNegrini/TrueFilm"/>
+        <img src="https://img.shields.io/github/workflow/status/AleNegrini/TrueFilm/cicd_truefilm"/>
+</p>
+
 ### Requirements
 
 Before running the job, please make sure your environment satisfies the following requirements:
