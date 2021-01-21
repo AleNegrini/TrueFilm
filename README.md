@@ -9,16 +9,13 @@
 
 Before running the job, please make sure your environment satisfies the following requirements:
 
-- `Python3` (recommended version: `Python3.7.X` . **Attention**: `Python>=3.8.x` does not support project's 
-PySpark version). 
-- `Docker`
+- `Docker` ([download link](http://github.com))
+- `Docker-compose` ([download link](http://github.com))
 
-### Dependencies
+## Run mode
+### Run the job
 
-
-### Build
-
-`virtual -p <python3.X bin path> .penv`
+### Get Access to the results
 
 
 ### Deploy
