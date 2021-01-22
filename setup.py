@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-    Setup file for truefilm.
+    Setup file for prop_cas_dbattuariale_base_contratti_nomotor.
     Use setup.cfg to configure your project.
-
-    This file was generated with PyScaffold 3.2.3.
+    This file was generated with PyScaffold 3.2.2.
     PyScaffold helps you to put up the scaffold of your new Python project.
     Learn more under: https://pyscaffold.org/
 """
@@ -20,4 +19,8 @@ except VersionConflict:
 
 
 if __name__ == "__main__":
-    setup(use_pyscaffold=True)
+    # get version, passed as argument
+    file = open("version.txt", "r")
+    my_ver = file.read()
+    setup(use_pyscaffold=False, version=my_ver)
+    file.close()

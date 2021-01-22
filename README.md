@@ -189,17 +189,18 @@ Once you're in, you should view something like this
 
 Whenever you push a commit directly to the ``develop`` branch (or you open a PR on develop), a `Github workflow` is 
 triggered.   
-The outcome of the workflow pipeline can che checked in the badge at the beginning of this README.
+The outcome of the workflow pipeline can be checked in the badge at the beginning of this README.
 
 ## Considerations
 
 ### Datasources
 You may have noted that the datasources downloaded and used throughout the entire job are different from the original
 ones. 
-They both were in a text format (.csv and .xml), that's why I dediced to preprocess save them in a bynary and columnar format 
+They both were in a text format (.csv and .xml), that's why I decided to preprocess and save them in a binary and 
+columnar format 
 (Parquet).
 
-In addition to that, the wikipedia file was pretty big (uncompressed it was neat to 7GB) and many of the columns were not
+In addition to that, the wikipedia file was pretty big (uncompressed it was near to 7GB) and many of the columns were not
 useful. 
 The new wikipedia file is 10x smaller (near to 700MB). 
 
@@ -209,27 +210,28 @@ is not recommended).
 ### Rules
 
 #### Movie title
-In order to increase the chances of join between metadata and wikipedia datasets, the titles were standardized applying
-the following transformations: 
+In order to increase the chances of the join between metadata and wikipedia datasets, the titles were standardized applying
+the following transformations on both sources: 
 1) make each letter lower
 2) remove punctuation characters
 3) remove double spaces 
 4) titles were finally trimmed
 
 #### Money columns: budget and revenues
-As far as I know, both the budgets and the revenues of movies is in the order of millions. 
-Some movies contain however too low values that would have generated false ``budget_revenue_ratio``. 
+As far as I know, both the budgets and the revenues of movies are in the order of millions. 
+However some movies contain too low values that would have generated not reliable ``budget_revenue_ratio``. 
 I therefore decided to remove all the movies having the budget less than 1M$ or revenues less than 1M$. 
 
 #### Matching rules
 The matching logic I implemented were fairly easy, and articulated in three phases:
 1) a few wikipedia rows have a title that includes the ``film`` keyword and the `year`,
-in the form of ``<title> (<year> film)``. These are the rows I used in this first step. 
+in the form of ``<title> (<year> film)``. These are the rows I used in this first step of the join. 
 Movies metadata and movies info are joined on the pair of fields `[title, year]`
-2) some other titles in the wikipedia file, are in the format of  ``<title> ( film)`` and therefore
-joined just using the `[title]` field
-3) the rest of the wikipedia movies (both without 'film' and 'year' tag) are finally joined with the remaining ones
+2) some other titles in the wikipedia file, are in the format of  ``<title> (film)`` and therefore
+joined using the `[title]` field only
+3) the rest of the wikipedia movies (both without 'film' and 'year' tag) are finally joined with the remaining 
+ones on `[title]` again 
 
 Obviously, the way I dealt with budget and revenue columns and the matching logic is quite rudimental, 
 and the more time you have the more sophisticated the logic can become. 
-I just wanted to give a first idea and to got a first result. 
+I just wanted to give a first idea and to get a first result. 

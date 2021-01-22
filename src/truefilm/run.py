@@ -81,11 +81,12 @@ if __name__ == '__main__':
 
     # init
     args = init()
-    env_vars = init_env(['XML_JAR_PATH','POSTGRES_JDBC_DRIVER','POSTGRES_HOST','POSTGRES_PORT'])
+    env_vars = init_env(['POSTGRES_HOST','POSTGRES_PORT'])
+
     spark_session = Spark(master=args.spark_master,
                           app_name=args.spark_app_name,
-                          xml_jar_path=env_vars['XML_JAR_PATH'],
-                          jdbc_jar_path=env_vars['POSTGRES_JDBC_DRIVER'],
+                          xml_jar_path=os.getcwd()+('/resources/jar/spark-xml_2.11-0.5.0.jar'),
+                          jdbc_jar_path=os.getcwd()+('/resources/jar/postgresql-42.2.18.jar'),
                           log_level='WARN')
 
     final_resources_path = Config().final_resources_check([args.movies_path, args.wikipedia_path])
@@ -167,7 +168,7 @@ if __name__ == '__main__':
                'genres',
                'abstract')
 
-    a = load_dotenv('../../database.env')
+    a = load_dotenv(os.getcwd()+'/database.env')
     url = jdbc_url_builder(host=env_vars['POSTGRES_HOST'],port=env_vars['POSTGRES_PORT'],db=os.environ['POSTGRES_DB'])
     properties = {"user": os.environ['POSTGRES_USER'],
                   "password": os.environ['POSTGRES_PASSWORD'],

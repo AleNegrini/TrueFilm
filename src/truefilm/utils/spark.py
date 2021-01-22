@@ -17,7 +17,6 @@ class Spark():
             .master(master)\
             .appName(app_name) \
             .config("spark.jars", xml_jar_path+','+jdbc_jar_path)\
-            .config("")\
             .getOrCreate()
 
         self.spark.sparkContext.setLogLevel(log_level)

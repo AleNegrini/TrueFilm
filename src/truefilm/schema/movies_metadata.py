@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from pyspark.sql.types import StructField, StructType, BooleanType, StringType, \
-    FloatType, IntegerType, MapType, LongType, DateType
+    FloatType, IntegerType, LongType, DateType
 
 from src.truefilm.utils.singleton_meta import SingletonMeta
 

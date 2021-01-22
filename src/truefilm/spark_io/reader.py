@@ -1,7 +1,6 @@
 from pyspark.sql import SparkSession, DataFrame, SQLContext
 from pyspark.sql.types import StructType
 from typing import Optional
-from typing import Dict
 import logging
 
 def read_csv_with_schema(spark: SparkSession,

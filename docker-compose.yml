@@ -16,6 +16,11 @@ services:
       - 5433:5432
     volumes:
       - database-data-dev:/var/lib/postgresql/data/ # persist data even if container shuts down
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
 volumes:
   database-data-prod: # named volumes can be managed easier using docker-compose
   database-data-dev:
