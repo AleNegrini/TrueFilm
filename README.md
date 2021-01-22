@@ -7,33 +7,32 @@
 
 `TrueFilm` is an insteresting challenge that embraces all the skills a modern Data Engineer should have:
 * software engineering skills
-* (big) data framework knowledge
+* (big) data frameworks' knowledge
 * software testing skills
 * DB knowledge
 * software automation and virtualization knowledge
 * problem solving skills
 
-Beyond the technical issues, there is also the limited ``time``.
-At the beginning you're asked to provide an estimation about the time it will take it to be solved: it could be 
-a way to measure how good you are estimating projects.
+Beyond the technical issues, another critical aspect is ``time``: at the beginning you're asked to provide 
+an estimation of the time needed to solve the problem: it could be a way to measure how good you are at estimating 
+projects.
 
-
-Unfortunately, I underestimated the time needed, since I didn't have time to properly packetize and virtualize as I
+Unfortunately, I underestimated the time needed: I didn't enough time to properly packetize and virtualize as I
 expected: I preferred to stay on deadlines at the expense of a poorer automation part (you'll find further details in
 the next section). 
 
 ## Run
 
 The solution in place is based on a `bash` script, called `run-script.sh` and it orchestrates a few steps. 
-Before running it, you should make sure you the following requirements are satisfied. 
+Before running it, you should make sure the following requirements are satisfied. 
 
-#### Requirements
+### Requirements
 * [docker](https://www.docker.com/products/docker-desktop)
 * [docker-compose](https://docs.docker.com/compose/install/)
 * [brew](https://brew.sh/)
 * [virtualenv]()
 
-#### Run the script
+### Run the script
 If requirements are met, just type:
 ```
 ./run-script.sh
@@ -69,20 +68,20 @@ To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLeve
 2021-01-22 18:40:22,429 - INFO - Spark Session has been successfully stopped
 ```
 
-This script should put the baseline for the program:
+This script should set the baseline for the program:
 1) installs a bunch of propedeutical packages
 2) setups the python virtualenv
 3) starts three docker containers using the `docker-compose.yml` file (further details below)
 4) downloads the source data from the clouds
 5) finally, it runs the job
 
-As said before, the process allowing to reproduce and to run automatically job, could be improved, using a more
+As said before, the process allows to reproduce and run automatically job, could be improved, using a more
 robust approach. 
 Instead of having a bash script, the pyspark application could be dockerized (using a `Dockerfile`) and orchestrated 
 via `docker-compose` as did for the postreSQL server and clients. 
 I would have followed this way, if I had had more time. 
 
-#### Run Tests
+### Run Tests
 
 Apart from running the code, you can also find a set of **unit tests** and **integration tests**.
 
@@ -115,13 +114,14 @@ OK
 
 Attention: before running integration tests, make sure the postreSQL dev container is up and running. 
 
-#### Getting access to the data
+### Getting access to the data
 
-Once the job ends its execution, you can check the results in two ways: 
-1) directly connect to the postreSQL production container
-2) use the postreSQL client directly on your computer
+Once the job ends, you can check the results in two ways: 
+1) directly connecting to the postreSQL production container
+2) using the postreSQL client directly on your computer
 
-**Connect to the container**
+####Connecting to the container
+
 Get the container id:
 ```
 alessandro.negrini@MBPdiAlessandro TrueFilm (develop) $ docker ps
@@ -166,8 +166,9 @@ truelayer_prod=# select count(*) from movies;
 (1 row)
 ```
 
-**Use the adminer local client**
-Among the containers run by the `./run-script.sh`, there is a DB client that you can reach via browser at [127.0.0.1:8080](http://localhost:8080/). 
+#### Using the adminer local client
+
+Among the containers run by the `./run-script.sh`, there is a DB client that can be reached via browser at [127.0.0.1:8080](http://localhost:8080/). 
 ![DB Intro](resources/db_intro.png?raw=true "Login")
 
 You can find the password in clear inside the `database.env`
@@ -176,28 +177,59 @@ Once you're in, you should view something like this
 
 ![DBin](resources/db_tables.png?raw=true "tables")
 
+### What's behind the hood
 
-## What's behind the hood
-
-If you're curious about how the `TrueFilm` job has been implemented, in this sections you'll find all the details
-regarding technologies, frameworks, and so on. 
-
-### Technology
+#### Technology
 - the solution is based on `Python` powered by the `PySpark` framework.
-- virtualization tool 
+- `docker` and `docker-compose` for the virtualization and the container "orchestration" part
+- `bash` for gluing everything 
+- `Python unittest` for testing the functions' correctness
 
+#### CI/CD
 
-
-### CICD
-
-Everytime you push a commit in the ``develop`` branch, a `Github workflow` is triggered
-and a build pipeline starts. 
+Whenever you push a commit directly to the ``develop`` branch (or you open a PR on develop), a `Github workflow` is 
+triggered.   
 The outcome of the workflow pipeline can che checked in the badge at the beginning of this README.
 
-## Final consideration
+## Considerations
 
 ### Datasources
-- The original datasources (especially the wikipedia one) was quite big (uncompressed was near to 6GB). 
-Therefore I opted to do a first preprocessing of the datasetsdoc, that implied: 
-    - format homogenity: both sources have been converted to the `.parquet` format for better performances after
-    - remove useless columns
+You may have noted that the datasources downloaded and used throughout the entire job are different from the original
+ones. 
+They both were in a text format (.csv and .xml), that's why I dediced to preprocess save them in a bynary and columnar format 
+(Parquet).
+
+In addition to that, the wikipedia file was pretty big (uncompressed it was neat to 7GB) and many of the columns were not
+useful. 
+The new wikipedia file is 10x smaller (near to 700MB). 
+
+The two new sources were then uploaded on dropbox, so that they can be easily shared and downloaded (uploading data on Github
+is not recommended). 
+
+### Rules
+
+#### Movie title
+In order to increase the chances of join between metadata and wikipedia datasets, the titles were standardized applying
+the following transformations: 
+1) make each letter lower
+2) remove punctuation characters
+3) remove double spaces 
+4) titles were finally trimmed
+
+#### Money columns: budget and revenues
+As far as I know, both the budgets and the revenues of movies is in the order of millions. 
+Some movies contain however too low values that would have generated false ``budget_revenue_ratio``. 
+I therefore decided to remove all the movies having the budget less than 1M$ or revenues less than 1M$. 
+
+#### Matching rules
+The matching logic I implemented were fairly easy, and articulated in three phases:
+1) a few wikipedia rows have a title that includes the ``film`` keyword and the `year`,
+in the form of ``<title> (<year> film)``. These are the rows I used in this first step. 
+Movies metadata and movies info are joined on the pair of fields `[title, year]`
+2) some other titles in the wikipedia file, are in the format of  ``<title> ( film)`` and therefore
+joined just using the `[title]` field
+3) the rest of the wikipedia movies (both without 'film' and 'year' tag) are finally joined with the remaining ones
+
+Obviously, the way I dealt with budget and revenue columns and the matching logic is quite rudimental, 
+and the more time you have the more sophisticated the logic can become. 
+I just wanted to give a first idea and to got a first result. 
