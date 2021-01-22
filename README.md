@@ -20,7 +20,6 @@ regarding technologies, frameworks, ...
 - the solution is based on `Python` powered by the `PySpark` framework.
 - 
 
-
 ### Tests
 Apart from the code, in this repo you can also find a set of `unit tests` and `integration tests`:
 - ``unit tests``: 22 tests checking most of the job functions and methods
@@ -31,6 +30,34 @@ You can manually run the unit tests by typing:
 ...
 test_spark_configurations (test.utils.test_spark.TestSpark) ... ok
 test_spark_session_instance_type (test.utils.test_spark.TestSpark) ... ok
+=======
+### Get Access to the data
+
+Three are the containers started by launching the `docker-compose`.
+If you want to check their details, just type:
+```
+docker ps
+```
+
+(*) container ids could be different 
+
+#### Dev DB
+```
+docker exec -it <container_name> bash
+```
+
+Connect to local database instace using the `psql` client:
+```
+psql --host=localhost --user= --db=
+```
+
+#### Prod DB
+
+```
+docker exec -it <container_name> bash
+```
+
+>>>>>>> b4372fbad0fe7a8e1ed627e8ad7c49cb55a33c7b
 
 ----------------------------------------------------------------------
 Ran 22 tests in 66.246s
