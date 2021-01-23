@@ -14,16 +14,19 @@
 * problem solving skills
 
 Beyond the technical issues, another critical aspect is ``time``: at the beginning you're asked to provide 
-an estimation of the time needed to solve the problem: it could be a way to measure how good you are at estimating 
+an estimation of the time needed to solve the problem and I think it could be a way to measure how good you are at estimating 
 projects.
 
-Unfortunately, I underestimated the time needed: I didn't enough time to properly packetize and virtualize as I
-expected: I preferred to stay on deadlines at the expense of a poorer automation part (you'll find further details in
+Unfortunately, I underestimated the time needed: I didn't have enough time to properly packetize and virtualize as I
+expected.
+However, I preferred to stay on deadlines at the expense of a poorer automation part (you'll find further details in
 the next section). 
 
 ## Run
 
-The solution in place is based on a `bash` script, called `run-script.sh` and it orchestrates a few steps. 
+The automation in place is based on a `bash` script, called `run-script.sh` and it is responsible for orchestrating
+different actions. 
+
 Before running it, you should make sure the following requirements are satisfied. 
 
 ### Requirements
@@ -33,7 +36,7 @@ Before running it, you should make sure the following requirements are satisfied
 * [virtualenv]()
 
 ### Run the script
-If requirements are met, just type:
+If the requirements are met, just type:
 ```
 ./run-script.sh
 ```
@@ -71,15 +74,16 @@ To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLeve
 This script should set the baseline for the program:
 1) installs a bunch of propedeutical packages
 2) setups the python virtualenv
-3) starts three docker containers using the `docker-compose.yml` file (further details below)
-4) downloads the source data from the clouds
-5) finally, it runs the job
+3) intalls python dependencies
+4) starts three docker containers using the `docker-compose.yml` file
+5) downloads the source data from the clouds
+6) runs the job
 
-As said before, the process allows to reproduce and run automatically job, could be improved, using a more
+As said before, the process allowing to reproduce and run automatically job, could be improved, using a more
 robust approach. 
-Instead of having a bash script, the pyspark application could be dockerized (using a `Dockerfile`) and orchestrated 
+Instead of having a bash script, the pyspark application could have been dockerized (using a `Dockerfile`) and orchestrated 
 via `docker-compose` as did for the postreSQL server and clients. 
-I would have followed this way, if I had had more time. 
+If I had more time, I would have followed this way. 
 
 ### Run Tests
 
@@ -120,7 +124,7 @@ Once the job ends, you can check the results in two ways:
 1) directly connecting to the postreSQL production container
 2) using the postreSQL client directly on your computer
 
-####Connecting to the container
+#### Connecting to the container
 
 Get the container id:
 ```
@@ -166,6 +170,9 @@ truelayer_prod=# select count(*) from movies;
 (1 row)
 ```
 
+You can find the password in clear inside the `database.env`
+
+
 #### Using the adminer local client
 
 Among the containers run by the `./run-script.sh`, there is a DB client that can be reached via browser at [127.0.0.1:8080](http://localhost:8080/). 
@@ -181,8 +188,8 @@ Once you're in, you should view something like this
 
 #### Technology
 - the solution is based on `Python` powered by the `PySpark` framework.
-- `docker` and `docker-compose` for the virtualization and the container "orchestration" part
-- `bash` for gluing everything 
+- the virtualization and the container orchestration part is based `docker` and `docker-compose`
+- `bash` for gluing everything together
 - `Python unittest` for testing the functions' correctness
 
 #### CI/CD
@@ -196,7 +203,7 @@ The outcome of the workflow pipeline can be checked in the badge at the beginnin
 ### Datasources
 You may have noted that the datasources downloaded and used throughout the entire job are different from the original
 ones. 
-They both were in a text format (.csv and .xml), that's why I decided to preprocess and save them in a binary and 
+They both were in a text format (.csv and .xml), and I decided to preprocess and save them in a binary and 
 columnar format 
 (Parquet).
 
@@ -218,16 +225,16 @@ the following transformations on both sources:
 4) titles were finally trimmed
 
 #### Money columns: budget and revenues
-As far as I know, both the budgets and the revenues of movies are in the order of millions. 
+As far as I know, the usual movies' budgets and the revenues are in the order of millions. 
 However some movies contain too low values that would have generated not reliable ``budget_revenue_ratio``. 
 I therefore decided to remove all the movies having the budget less than 1M$ or revenues less than 1M$. 
 
 #### Matching rules
-The matching logic I implemented were fairly easy, and articulated in three phases:
+The matching logic I implemented is fairly easy, and articulated in three phases:
 1) a few wikipedia rows have a title that includes the ``film`` keyword and the `year`,
 in the form of ``<title> (<year> film)``. These are the rows I used in this first step of the join. 
 Movies metadata and movies info are joined on the pair of fields `[title, year]`
-2) some other titles in the wikipedia file, are in the format of  ``<title> (film)`` and therefore
+2) some other titles in the wikipedia file are in the format of  ``<title> (film)`` and therefore
 joined using the `[title]` field only
 3) the rest of the wikipedia movies (both without 'film' and 'year' tag) are finally joined with the remaining 
 ones on `[title]` again 
