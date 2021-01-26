@@ -104,8 +104,8 @@ OK
 
 ```
 
-**Unit Tests**
-- ``unit tests``: 1 tests checking whether the two-way communication works or not.
+**Integration Tests**
+- ``integration test``: 1 tests checking whether the two-way communication works or not.
 
 ```
 ./run-tests-it.sh
